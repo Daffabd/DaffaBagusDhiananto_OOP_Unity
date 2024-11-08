@@ -12,10 +12,13 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveFriction;
     private Vector2 stopFriction;
     private Rigidbody2D rb;
+    private Vector2 cameraBounds;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        // Hitung kecepatan dan friksi
         moveVelocity = new Vector2(
             2 * maxSpeed.x / timeToFullSpeed.x,
             2 * maxSpeed.y / timeToFullSpeed.y
@@ -30,6 +33,12 @@ public class PlayerMovement : MonoBehaviour
             2 * maxSpeed.x / Mathf.Pow(timeToStop.x, 2),
             2 * maxSpeed.y / Mathf.Pow(timeToStop.y, 2)
         );
+
+        // Tentukan batas kamera
+        Camera camera = Camera.main;
+        float cameraHeight = camera.orthographicSize;
+        float cameraWidth = cameraHeight * camera.aspect;
+        cameraBounds = new Vector2(cameraWidth, cameraHeight);
     }
 
     public void Move()
@@ -46,6 +55,9 @@ public class PlayerMovement : MonoBehaviour
             Mathf.Lerp(currentVelocity.x, targetVelocity.x, friction.x * Time.fixedDeltaTime),
             Mathf.Lerp(currentVelocity.y, targetVelocity.y, friction.y * Time.fixedDeltaTime)
         );
+
+        // Batasi pergerakan pesawat dalam batas kamera
+        ClampPosition();
     }
 
     private Vector2 GetFriction(Vector2 currentVelocity)
@@ -54,6 +66,19 @@ public class PlayerMovement : MonoBehaviour
             Mathf.Abs(currentVelocity.x) > stopClamp.x ? moveFriction.x : stopFriction.x,
             Mathf.Abs(currentVelocity.y) > stopClamp.y ? moveFriction.y : stopFriction.y
         );
+    }
+
+    private void ClampPosition()
+    {
+        // Dapatkan posisi pesawat
+        Vector3 position = transform.position;
+
+        // Tentukan batas posisi x dan y sesuai dengan batas kamera
+        position.x = Mathf.Clamp(position.x, -cameraBounds.x, cameraBounds.x);
+        position.y = Mathf.Clamp(position.y, -cameraBounds.y, cameraBounds.y);
+
+        // Perbarui posisi pesawat jika melampaui batas
+        transform.position = position;
     }
 
     public bool IsMoving()
