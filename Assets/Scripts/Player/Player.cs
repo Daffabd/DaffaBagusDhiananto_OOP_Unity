@@ -2,37 +2,60 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public static Player Instance;
-    private PlayerMovement playerMovement;
-    private Animator animator;
+    // This for getting the instace of Player Singleton
+    public static Player Instance { get; private set; }
 
-    private void Awake()
+    // Getting the PlayerMovement methods
+    PlayerMovement playerMovement;
+    // Animator
+    Animator animator;
+
+
+    // Key for Singleton
+    void Awake()
     {
-        // Membuat instance Singleton untuk Player
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
+            Destroy(this);
+            return;
         }
-        else
+
+        Instance = this;
+
+        DontDestroyOnLoad(gameObject);
+    }
+
+    // Getting Component
+    void Start()
+    {
+        // Get PlayerMovement components
+        playerMovement = GetComponent<PlayerMovement>();
+
+        // Get Animator components
+        animator = GameObject.Find("EngineEffects").GetComponent<Animator>();
+    }
+
+    // Using FixedUpdate to Move because of physics
+    void FixedUpdate()
+    {
+        playerMovement.Move();
+    }
+
+    // LateUpdate for animation related
+    void LateUpdate()
+    {
+        playerMovement.MoveBound();
+        animator.SetBool("IsMoving", playerMovement.IsMoving());
+    }
+
+    private WeaponPickup currentWeaponPickup;
+
+    public void SwitchWeapon(Weapon newWeapon, WeaponPickup newWeaponPickup)
+    {
+        if (currentWeaponPickup != null)
         {
-            Destroy(this.gameObject);
+            currentWeaponPickup.PickupHandler(true);  // Make the previous weapon pickup visible again
         }
-    }
-
-    private void Start()
-    {
-        // Mengambil referensi dari komponen PlayerMovement dan Animator
-        playerMovement = this.GetComponent<PlayerMovement>();
-        animator = transform.Find("Engine/EngineEffect").GetComponent<Animator>();
-    }
-
-    private void FixedUpdate()
-    {
-        this.playerMovement.Move();
-    }
-
-    private void LateUpdate()
-    {
-        animator.SetBool("IsMoving", this.playerMovement.IsMoving());
+        currentWeaponPickup = newWeaponPickup;
     }
 }
