@@ -2,27 +2,33 @@ using UnityEngine;
 
 public class EnemyForward : Enemy
 {
-    public float speed = 5f; // Kecepatan gerak musuh
-    private Vector2 screenBounds;
+    public float speed = 5f;
 
+    private Vector2 vertical;
+
+    private Rigidbody2D rb;
     private void Start()
     {
-        // Mendapatkan batas layar berdasarkan kamera utama
-        screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
 
-        // Spawn musuh di atas layar secara horizontal acak
-        transform.position = new Vector3(Random.Range(-screenBounds.x, screenBounds.x), screenBounds.y + 1f, 0);
+        float spawnSide = Random.Range(-9, 9);
+        vertical = new Vector2(spawnSide, 0);
+
+        transform.position = new Vector2(spawnSide, 6);
+        rb.velocity = Vector2.down * speed;
+        
     }
-
     private void Update()
     {
-        // Pergerakan ke bawah
         transform.Translate(Vector2.down * speed * Time.deltaTime);
 
-        // Jika musuh keluar dari layar, hancurkan objek
-        if (transform.position.y < -screenBounds.y - 1f)
+        // Destroy the enemy if it goes off the bottom of the screen
+        if (transform.position.y < -5) // Adjust screen boundaries as needed
         {
-            Destroy(gameObject);
+            float spawnSide = Random.Range(-9, 9);
+            vertical = new Vector2(spawnSide, 0);
+            transform.position = new Vector2(spawnSide, 6);
+            rb.velocity = Vector2.down * speed;
         }
     }
 }
+

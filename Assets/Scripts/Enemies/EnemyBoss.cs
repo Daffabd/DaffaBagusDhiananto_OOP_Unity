@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyBoss : Enemy
 {
     public float speed = 3f;             // Kecepatan gerak musuh
-    public GameObject bulletPrefab;     // Prefab peluru
+    public Weapon bossWeapon;
     public float shootInterval = 2f;    // Interval menembak
     private float shootTimer;
 
@@ -17,7 +17,7 @@ public class EnemyBoss : Enemy
 
         // Spawn musuh di posisi acak di sisi atas layar
         float spawnSide = Random.Range(0, 2) == 0 ? -1f : 1f;
-        transform.position = new Vector3(spawnSide * screenBounds.x, Random.Range(-4f, 4f), 0);
+        transform.position = new Vector3(spawnSide * screenBounds.x, Random.Range(0, 4f), 0);
 
         // Atur arah gerakan horizontal
         direction = new Vector2(spawnSide, 0);
@@ -48,7 +48,9 @@ public class EnemyBoss : Enemy
 
     private void Shoot()
     {
-        // Spawn peluru di posisi EnemyBoss
-        Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+        if (bossWeapon != null)
+        {
+            bossWeapon.Shoot();
+        }
     }
 }

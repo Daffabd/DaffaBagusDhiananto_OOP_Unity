@@ -72,7 +72,7 @@ private void Awake()
         }
     }
 
-    private void Shoot()
+    public void Shoot()
     {
         Bullet newBullet = objectPool.Get();
         newBullet.transform.position = bulletSpawnPoint.position;

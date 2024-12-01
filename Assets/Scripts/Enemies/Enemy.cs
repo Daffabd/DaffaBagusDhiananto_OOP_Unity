@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public int Level;
+    public EnemySpawner enemySpawner;
+    [SerializeField] public CombatManager combatManager;
+
+    protected virtual void Awake()
     {
-        
+        //
+    }
+    private void OnDestroy()
+    {
+        if (enemySpawner != null && combatManager != null)
+        {
+            enemySpawner.onDeath();
+            combatManager.onDeath(this);
+
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-        
+        // Logika dasar untuk Enemy
     }
 }
